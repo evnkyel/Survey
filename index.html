@@ -215,10 +215,8 @@
     const nextButton = document.getElementById("nextBtn");
 
     let activeMediaFrame = null;
-
-    // --- New Custom Alert Function ---
+gi
     function showCustomAlert(message) {
-        // 1. Create the alert overlay and box elements
         const alertOverlay = document.createElement('div');
         alertOverlay.id = 'customAlertOverlay';
         alertOverlay.style.cssText = `
@@ -245,7 +243,6 @@
             font-family: 'Poppins', sans-serif;
         `;
 
-        // 2. Add message and button to the alert box
         alertBox.innerHTML = `
             <p style="margin-bottom: 20px; font-size: 1.1rem; color: #333;">${message}</p>
             <button id="alertOKBtn" style="
@@ -260,33 +257,28 @@
             ">OK</button>
         `;
 
-        // 3. Append to body and set up close handler
         alertOverlay.appendChild(alertBox);
         document.body.appendChild(alertOverlay);
 
         const okButton = document.getElementById('alertOKBtn');
         okButton.onclick = () => {
             alertOverlay.remove();
-            // Restore focus to the last element (input or radio) if possible
             const currentQ = questions[current];
             if (currentQ.type === "text") {
                 document.getElementById("answer")?.focus();
             }
-            // Note: Radio focus restoration is more complex and often omitted
         };
         
-        // Allow Enter key to dismiss the custom alert
         document.addEventListener('keydown', function dismissAlert(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 okButton.click();
-                document.removeEventListener('keydown', dismissAlert); // Remove listener after use
+                document.removeEventListener('keydown', dismissAlert); 
             }
         });
         
-        okButton.focus(); // Focus the OK button
+        okButton.focus();
     }
-    // ------------------------------------
 
     function removeActiveMedia() {
         if (activeMediaFrame) {
@@ -373,9 +365,7 @@
         if (currentQ.type === "text") {
             const input = document.getElementById("answer");
             if (!input || input.value.trim() === "") {
-                // CHANGED: Use custom alert instead of standard alert
                 showCustomAlert("Please enter a response.");
-                // input.focus() is now handled within the custom alert dismissal
                 return;
             }
         }
@@ -393,7 +383,6 @@
 
         const selected = document.querySelector('input[name="relationship"]:checked');
         if (!selected) {
-            // CHANGED: Use custom alert instead of standard alert
             showCustomAlert("Please choose one!");
             return;
         }
