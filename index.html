@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            
+            max-width: 900px;
+            width: 90%; 
+            margin: 0 auto; 
+            height: auto;
+            width: auto;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+
+        .container h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            width: 100%;
+        }
+
+        .content-flex-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        #questionAndButton {
+            flex-grow: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #questionBox {
+            width: 100%;
+        }
+
+        #questionBox p {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 0.6rem;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #5a9cf8;
+            box-shadow: 0 0 5px rgba(90, 156, 248, 0.3);
+        }
+
+        label {
+            display: block;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        #nextBtn {
+            background: #5a9cf8;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #nextBtn:hover {
+            background: #3d7fe0;
+        }
+
+        .gifBox {
+            width: 300px;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .gifBox:empty {
+            width: 0;
+            min-height: 0;
+            padding: 0;
+        }
+
+        .gifBox iframe,
+        .tenor-gif-embed {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .container img {
+            display: none;
+        }
+    
+        .final-gif-display {
+            margin-top: 1rem;
+            max-width: 300px;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .final-gif-display .tenor-gif-embed {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        } 
+
+        .message {
+            font-size: 1.1rem;
+            color: #555;
+            margin-top: 1rem;
+        }
+    
+        @media (max-width: 768px) {
+            .content-flex-wrapper {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            #questionAndButton {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .gifBox {
+                width: 100%;
+                margin-top: 1.5rem;
+            }
+
+            /* ⚠️ The width: 90% is now already in the main .container rule and this line is effectively redundant but harmless. */
+            /* .container {
+                width: 90%;
+            } */ 
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container" id="surveyBox">
+            <h1>Survey Questions</h1>
+
+            <div class="content-flex-wrapper" id="contentFlexWrapper">
+
+                <div id="questionAndButton">
+                    <div id="questionBox"></div>
+                    <button id="nextBtn" onclick="nextQuestion()">Submit</button>
+                </div>
+
+                <div class="gifBox" id="gifBox">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { type: "text", question: "What's your name?", placeholder: "Enter your name" },
+            { type: "text", question: "What's your favorite color?", placeholder: "Type your favorite color" },
+            { type: "text", question: "What's your favorite hobby?", placeholder: "Enter your hobby" },
+            { type: "text", question: "If you had one wish, what would it be?", placeholder: "Enter your wish" },
+            { type: "radio", question: "What's your relationship status?", options: ["Single", "In a relationship"] },
+        ];
+
+        let current = 0;
+        const surveyBox = document.getElementById("surveyBox");
+        const questionBox = document.getElementById("questionBox");
+        const gifBox = document.getElementById("gifBox");
+        const questionAndButton = document.getElementById("questionAndButton");
+    
+        let activeMediaFrame = null;
+
+        function removeActiveMedia() {
+            if (activeMediaFrame) {
+                activeMediaFrame.remove();
+                activeMediaFrame = null;
+            }
+        }
+    
+        function loadTenorScript() {
+            const scriptId = 'tenor-embed-script'; 
+            if (document.getElementById(scriptId)) {
+                document.getElementById(scriptId).remove();
+            }
+
+            const newScript = document.createElement("script");
+            newScript.id = scriptId;
+            newScript.src = "https://tenor.com/embed.js";
+            newScript.async = true;
+            document.body.appendChild(newScript);
+        }
+
+
+        function showQuestion(index) {
+            const q = questions[index];
+    
+            removeActiveMedia();
+            gifBox.innerHTML = "";  
+    
+            if (q.type === "text") {
+                questionBox.innerHTML = `
+            <p>${q.question}</p>
+            <input id="answer" type="text" placeholder="${q.placeholder}">
+        `;
+            } else if (q.type === "radio") {
+                const optionsHTML = q.options
+                    .map(
+                        (opt) =>
+                            `<label><input type="radio" name="relationship" value="${opt.toLowerCase()}">${opt}</label>`
+                    )
+                    .join("");
+                questionBox.innerHTML = `
+            <p>${q.question}</p>
+            <div>${optionsHTML}</div>
+        `;
+            }
+    
+            if (q.question.includes("one wish")) { 
+                activeMediaFrame = document.createElement("iframe");
+                activeMediaFrame.src = "https://www.youtube.com/embed/4VblcPN0eYw?start=57&autoplay=1";
+                activeMediaFrame.allow = "autoplay";
+                activeMediaFrame.style.display = "none";
+                document.body.appendChild(activeMediaFrame);
+    
+                gifBox.innerHTML = `
+            <div class="tenor-gif-embed" data-postid="8252737" data-share-method="host" data-aspect-ratio="1.33871" data-width="100%">
+              <a href="https://tenor.com/view/stewie-griffin-dance-wiggle-family-guy-gif-8252737">Stewie Griffin Dance GIF</a> from
+              <a href="https://tenor.com/search/stewie+griffin-gifs">Stewie Griffin GIFs</a>
+            </div>
+        `;
+    
+                loadTenorScript(); 
+            }
+        }
+
+        function nextQuestion() {
+            if (current < questions.length - 1) {
+                current++;
+                showQuestion(current);
+            } else {
+                handleFinalAnswer();
+            }
+        }
+
+        function handleFinalAnswer() {
+            const selected = document.querySelector('input[name="relationship"]:checked');
+            if (!selected) {
+                alert("Please choose one!");
+                return;
+            }
+
+            const value = selected.value;
+    
+            const contentFlexWrapper = document.getElementById("contentFlexWrapper");
+            contentFlexWrapper.remove();
+            gifBox.innerHTML = "";  
+            removeActiveMedia();  
+    
+            surveyBox.style.alignItems = "center";
+
+            let finalHTML = '';
+
+            if (value === "single") {
+    
+                finalHTML = `
+            <h1>Kawawa HAHAHHAHA</h1>
+            <div id="singleGif" class="final-gif-display">
+              <div class="tenor-gif-embed" data-postid="4207567105497530447" data-share-method="host" data-aspect-ratio="0.800971" data-width="100%">
+                <a href="https://tenor.com/view/laugh-dog-gif-4207567105497530447">Laugh Dog GIF</a>from
+                <a href="https://tenor.com/search/laugh+dog-gifs">Laugh Dog GIFs</a>
+              </div>
+            </div>
+        `;
+                surveyBox.innerHTML = finalHTML;
+    
+                loadTenorScript();
+    
+                activeMediaFrame = document.createElement("iframe");
+                activeMediaFrame.src = "https://www.youtube.com/embed/JiNh-go3YCs?autoplay=1&loop=1&playlist=JiNh-go3YCs";
+                activeMediaFrame.allow = "autoplay";
+                activeMediaFrame.style.width = "0";
+                activeMediaFrame.style.height = "0";
+                activeMediaFrame.style.border = "0";
+                activeMediaFrame.style.display = "none";
+                document.body.appendChild(activeMediaFrame);
+
+            } else { 
+                finalHTML = `
+            <h1>Talaga ba? u sure?</h1>
+            <div id="takenGif" class="final-gif-display">
+              <div class="tenor-gif-embed" data-postid="22611582" data-share-method="host" data-aspect-ratio="1.36752" data-width="100%">
+                <a href="https://tenor.com/view/hmm-suspect-gif-22611582">Hmm Suspect GIF</a>from <a href="https://tenor.com/search/hmm-gifs">Hmm GIFs</a></div>
+              </div>
+            </div>
+        `;
+                surveyBox.innerHTML = finalHTML;
+    
+                loadTenorScript();
+    
+                activeMediaFrame = document.createElement("iframe");
+                activeMediaFrame.src = "https://www.youtube.com/embed/pyxLFVidYCo?autoplay=1&loop=1&playlist=pyxLFVidYCo";
+                activeMediaFrame.allow = "autoplay";
+                activeMediaFrame.style.width = "0";
+                activeMediaFrame.style.height = "0";
+                activeMediaFrame.style.border = "0";
+                activeMediaFrame.style.display = "none";
+                document.body.appendChild(activeMediaFrame);
+            }
+        }
+
+        showQuestion(current);
+    </script>
+</body>
+
+</html>
