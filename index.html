@@ -30,14 +30,14 @@
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             max-width: 900px;
-            width: 90%; 
-            margin: 0 auto; 
+            width: 90%;
+            margin: 0 auto;
             height: auto;
             width: auto;
             transition: all 0.3s ease;
             text-align: center;
         }
-        
+
 
         .container h1 {
             color: #333;
@@ -136,14 +136,14 @@
         .container img {
             display: none;
         }
-    
+
         .final-gif-display {
             margin-top: 1rem;
             max-width: 300px;
             width: 100%;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-left: auto;
             margin-right: auto;
         }
@@ -153,14 +153,14 @@
             height: auto;
             display: block;
             pointer-events: none;
-        } 
+        }
 
         .message {
             font-size: 1.1rem;
             color: #555;
             margin-top: 1rem;
         }
-    
+
         @media (max-width: 768px) {
             .content-flex-wrapper {
                 flex-direction: column;
@@ -199,27 +199,27 @@
     </div>
 
     <script>
-    const questions = [
-        { type: "text", question: "What's your name?", placeholder: "Enter your name" },
-        { type: "text", question: "What's your favorite color?", placeholder: "Type your favorite color" },
-        { type: "text", question: "What's your favorite hobby?", placeholder: "Enter your hobby" },
-        { type: "text", question: "If you had one wish, what would it be?", placeholder: "Enter your wish" },
-        { type: "radio", question: "What's your relationship status?", options: ["Single", "In a relationship"] },
-    ];
+        const questions = [
+            { type: "text", question: "What's your name?", placeholder: "Enter your name" },
+            { type: "text", question: "What's your favorite color?", placeholder: "Type your favorite color" },
+            { type: "text", question: "What's your favorite hobby?", placeholder: "Enter your hobby" },
+            { type: "text", question: "If you had one wish, what would it be?", placeholder: "Enter your wish" },
+            { type: "radio", question: "What's your relationship status?", options: ["Single", "In a relationship"] },
+        ];
 
-    let current = 0;
-    const surveyBox = document.getElementById("surveyBox");
-    const questionBox = document.getElementById("questionBox");
-    const gifBox = document.getElementById("gifBox");
-    const questionAndButton = document.getElementById("questionAndButton");
-    const nextButton = document.getElementById("nextBtn");
+        let current = 0;
+        const surveyBox = document.getElementById("surveyBox");
+        const questionBox = document.getElementById("questionBox");
+        const gifBox = document.getElementById("gifBox");
+        const questionAndButton = document.getElementById("questionAndButton");
+        const nextButton = document.getElementById("nextBtn");
 
-    let activeMediaFrame = null;
+        let activeMediaFrame = null;
 
-    function showCustomAlert(message) {
-        const alertOverlay = document.createElement('div');
-        alertOverlay.id = 'customAlertOverlay';
-        alertOverlay.style.cssText = `
+        function showCustomAlert(message) {
+            const alertOverlay = document.createElement('div');
+            alertOverlay.id = 'customAlertOverlay';
+            alertOverlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -232,8 +232,8 @@
             z-index: 1000;
         `;
 
-        const alertBox = document.createElement('div');
-        alertBox.style.cssText = `
+            const alertBox = document.createElement('div');
+            alertBox.style.cssText = `
             background: white;
             padding: 20px 30px;
             border-radius: 10px;
@@ -243,7 +243,7 @@
             font-family: 'Poppins', sans-serif;
         `;
 
-        alertBox.innerHTML = `
+            alertBox.innerHTML = `
             <p style="margin-bottom: 20px; font-size: 1.1rem; color: #333;">${message}</p>
             <button id="alertOKBtn" style="
                 background: #5a9cf8;
@@ -257,150 +257,166 @@
             ">OK</button>
         `;
 
-        alertOverlay.appendChild(alertBox);
-        document.body.appendChild(alertOverlay);
+            alertOverlay.appendChild(alertBox);
+            document.body.appendChild(alertOverlay);
 
-        const okButton = document.getElementById('alertOKBtn');
-        okButton.onclick = () => {
-            alertOverlay.remove();
-            const currentQ = questions[current];
-            if (currentQ.type === "text") {
-                document.getElementById("answer")?.focus();
+            const okButton = document.getElementById('alertOKBtn');
+            okButton.onclick = () => {
+                alertOverlay.remove();
+                const currentQ = questions[current];
+                if (currentQ.type === "text") {
+                    document.getElementById("answer")?.focus();
+                }
+            };
+
+            document.addEventListener('keydown', function dismissAlert(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    okButton.click();
+                    document.removeEventListener('keydown', dismissAlert);
+                }
+            });
+
+            okButton.focus();
+        }
+
+        function removeActiveMedia() {
+            if (activeMediaFrame) {
+                activeMediaFrame.remove();
+                activeMediaFrame = null;
             }
-        };
-        
-        document.addEventListener('keydown', function dismissAlert(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                okButton.click();
-                document.removeEventListener('keydown', dismissAlert); 
+        }
+
+        function loadTenorScript() {
+            const scriptId = 'tenor-embed-script';
+            if (document.getElementById(scriptId)) {
+                document.getElementById(scriptId).remove();
             }
-        });
-        
-        okButton.focus(); 
-    }
 
-    function removeActiveMedia() {
-        if (activeMediaFrame) {
-            activeMediaFrame.remove();
-            activeMediaFrame = null;
-        }
-    }
-
-    function loadTenorScript() {
-        const scriptId = 'tenor-embed-script';
-        if (document.getElementById(scriptId)) {
-            document.getElementById(scriptId).remove();
+            const newScript = document.createElement("script");
+            newScript.id = scriptId;
+            newScript.src = "https://tenor.com/embed.js";
+            newScript.async = true;
+            document.body.appendChild(newScript);
         }
 
-        const newScript = document.createElement("script");
-        newScript.id = scriptId;
-        newScript.src = "https://tenor.com/embed.js";
-        newScript.async = true;
-        document.body.appendChild(newScript);
-    }
-
-    function addEnterKeySubmitListener() {
-        document.removeEventListener('keydown', handleEnterKey);
-        document.addEventListener('keydown', handleEnterKey);
-    }
-
-    function handleEnterKey(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            nextButton.click();
+        function addEnterKeySubmitListener() {
+            document.removeEventListener('keydown', handleEnterKey);
+            document.addEventListener('keydown', handleEnterKey);
         }
-    }
 
-    function showQuestion(index) {
-        const q = questions[index];
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                nextButton.click();
+            }
+        }
 
-        removeActiveMedia();
-        gifBox.innerHTML = "";
+        function showQuestion(index) {
+            const q = questions[index];
 
-        if (q.type === "text") {
-            questionBox.innerHTML = `
+            removeActiveMedia();
+            gifBox.innerHTML = "";
+
+            if (q.type === "text") {
+                questionBox.innerHTML = `
                 <p>${q.question}</p>
                 <input id="answer" type="text" placeholder="${q.placeholder}">
             `;
-        } else if (q.type === "radio") {
-            const optionsHTML = q.options
-                .map(
-                    (opt) =>
-                        `<label><input type="radio" name="relationship" value="${opt.toLowerCase()}">${opt}</label>`
-                )
-                .join("");
-            questionBox.innerHTML = `
+            } else if (q.type === "radio") {
+                const optionsHTML = q.options
+                    .map(
+                        (opt) =>
+                            `<label><input type="radio" name="relationship" value="${opt.toLowerCase()}">${opt}</label>`
+                    )
+                    .join("");
+                questionBox.innerHTML = `
                 <p>${q.question}</p>
                 <div>${optionsHTML}</div>
             `;
-        }
+            }
 
-        addEnterKeySubmitListener();
+            addEnterKeySubmitListener();
 
-        if (q.type === "text") {
-            document.getElementById("answer").focus();
-        }
+            if (q.type === "text") {
+                document.getElementById("answer").focus();
+            }
 
-        if (q.question.includes("one wish")) {
-            activeMediaFrame = document.createElement("iframe");
-            activeMediaFrame.src = "https://www.youtube-nocookie.com/embed/4VblcPN0eYw?start=57&autoplay=1";
-            activeMediaFrame.allow = "autoplay";
-            activeMediaFrame.style.display = "none";
-            document.body.appendChild(activeMediaFrame);
+            if (q.question.includes("one wish")) {
+                removeActiveMedia();
 
-            gifBox.innerHTML = `
+                const audio = document.createElement("audio");
+                audio.src = "Ray J - One Wish.mp3";
+                audio.autoplay = true;
+                audio.loop = false;
+                audio.volume = 0.8;
+                audio.style.display = "none";
+
+                audio.addEventListener("loadedmetadata", () => {
+                    if (audio.duration > 57) {
+                        audio.currentTime = 57;
+                    }
+                    audio.play().catch(() => {
+                        console.warn("Autoplay might be blocked until user interacts with the page.");
+                    });
+                });
+
+                document.body.appendChild(audio);
+                activeMediaFrame = audio;
+
+                gifBox.innerHTML = `
                 <div class="tenor-gif-embed" data-postid="8252737" data-share-method="host" data-aspect-ratio="1.33871" data-width="100%">
                     <a href="https://tenor.com/view/stewie-griffin-dance-wiggle-family-guy-gif-8252737">Stewie Griffin Dance GIF</a> from
                     <a href="https://tenor.com/search/stewie+griffin-gifs">Stewie Griffin GIFs</a>
                 </div>
             `;
 
-            loadTenorScript();
-        }
-    }
-
-    function nextQuestion() {
-        const currentQ = questions[current];
-        if (currentQ.type === "text") {
-            const input = document.getElementById("answer");
-            if (!input || input.value.trim() === "") {
-                showCustomAlert("Please enter a response.");
-                return;
+                loadTenorScript();
             }
         }
 
-        if (current < questions.length - 1) {
-            current++;
-            showQuestion(current);
-        } else {
-            handleFinalAnswer();
+        function nextQuestion() {
+            const currentQ = questions[current];
+            if (currentQ.type === "text") {
+                const input = document.getElementById("answer");
+                if (!input || input.value.trim() === "") {
+                    showCustomAlert("Please enter a response.");
+                    return;
+                }
+            }
+
+            if (current < questions.length - 1) {
+                current++;
+                showQuestion(current);
+            } else {
+                handleFinalAnswer();
+            }
         }
-    }
 
-    function handleFinalAnswer() {
-        document.removeEventListener('keydown', handleEnterKey);
+        function handleFinalAnswer() {
+            document.removeEventListener('keydown', handleEnterKey);
 
-        const selected = document.querySelector('input[name="relationship"]:checked');
-        if (!selected) {
-            showCustomAlert("Please choose one!");
-            return;
-        }
+            const selected = document.querySelector('input[name="relationship"]:checked');
+            if (!selected) {
+                showCustomAlert("Please choose one!");
+                return;
+            }
 
-        const value = selected.value;
+            const value = selected.value;
 
-        const contentFlexWrapper = document.getElementById("contentFlexWrapper");
-        contentFlexWrapper.remove();
-        gifBox.innerHTML = "";
-        removeActiveMedia();
+            const contentFlexWrapper = document.getElementById("contentFlexWrapper");
+            contentFlexWrapper.remove();
+            gifBox.innerHTML = "";
+            removeActiveMedia();
 
-        surveyBox.style.alignItems = "center";
+            surveyBox.style.alignItems = "center";
 
-        let finalHTML = '';
+            let finalHTML = '';
 
-        if (value === "single") {
+            removeActiveMedia();
 
-            finalHTML = `
+            if (value === "single") {
+                finalHTML = `
                 <h1>Kawawa HAHAHHAHA</h1>
                 <div id="singleGif" class="final-gif-display">
                     <div class="tenor-gif-embed" data-postid="4207567105497530447" data-share-method="host" data-aspect-ratio="0.800971" data-width="100%">
@@ -409,45 +425,43 @@
                     </div>
                 </div>
             `;
-            surveyBox.innerHTML = finalHTML;
+                surveyBox.innerHTML = finalHTML;
+                loadTenorScript();
 
-            loadTenorScript();
+                const singleSound = document.createElement("audio");
+                singleSound.src = "Green Screen Laughing Dog Meme.mp3";
+                singleSound.autoplay = true;
+                singleSound.loop = false;
+                singleSound.volume = 0.9;
+                singleSound.style.display = "none";
+                document.body.appendChild(singleSound);
+                activeMediaFrame = singleSound;
 
-            activeMediaFrame = document.createElement("iframe");
-            activeMediaFrame.src = "https://www.youtube-nocookie.com/embed/JiNh-go3YCs?autoplay=1&loop=1&playlist=JiNh-go3YCs";
-            activeMediaFrame.allow = "autoplay";
-            activeMediaFrame.style.width = "0";
-            activeMediaFrame.style.height = "0";
-            activeMediaFrame.style.border = "0";
-            activeMediaFrame.style.display = "none";
-            document.body.appendChild(activeMediaFrame);
-
-        } else {
-            finalHTML = `
+            } else {
+                finalHTML = `
                 <h1>Talaga ba? u sure?</h1>
                 <div id="takenGif" class="final-gif-display">
                     <div class="tenor-gif-embed" data-postid="22611582" data-share-method="host" data-aspect-ratio="1.36752" data-width="100%">
-                        <a href="https://tenor.com/view/hmm-suspect-gif-22611582">Hmm Suspect GIF</a>from <a href="https://tenor.com/search/hmm-gifs">Hmm GIFs</a></div>
+                        <a href="https://tenor.com/view/hmm-suspect-gif-22611582">Hmm Suspect GIF</a>from 
+                        <a href="https://tenor.com/search/hmm-gifs">Hmm GIFs</a>
                     </div>
                 </div>
             `;
-            surveyBox.innerHTML = finalHTML;
+                surveyBox.innerHTML = finalHTML;
+                loadTenorScript();
 
-            loadTenorScript();
-
-            activeMediaFrame = document.createElement("iframe");
-            activeMediaFrame.src = "https://www.youtube-nocookie.com/embed/pyxLFVidYCo?autoplay=1&loop=1&playlist=pyxLFVidYCo";
-            activeMediaFrame.allow = "autoplay";
-            activeMediaFrame.style.width = "0";
-            activeMediaFrame.style.height = "0";
-            activeMediaFrame.style.border = "0";
-            activeMediaFrame.style.display = "none";
-            document.body.appendChild(activeMediaFrame);
+                const takenSound = document.createElement("audio");
+                takenSound.src = "Amongus impostor sound effect  tiktok version slow.mp3";
+                takenSound.autoplay = true;
+                takenSound.loop = false;
+                takenSound.volume = 0.9;
+                takenSound.style.display = "none";
+                document.body.appendChild(takenSound);
+                activeMediaFrame = takenSound;
+            }
         }
-    }
-
-    showQuestion(current);
-</script>
+        showQuestion(current);
+    </script>
 </body>
 
 </html>
